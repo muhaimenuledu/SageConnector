@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="harriswebworks" translate="label" sortOrder="110" class="harriswebworks">
+            <label>Harris Web Works</label>
+        </tab>
+        <section id="hww_SageConnector" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>SageConnector Settings</label>
+            <tab>harriswebworks</tab>
+            <resource>Harriswebworks_SageConnector::config</resource>
+            <group id="general" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="url" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sage url</label>
+                    <depends>
+                        <field id="hww_SageConnector/general/enabled">1</field>
+                    </depends>
+                </field>
+                <field id="api_key" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Key</label>
+                    <depends>
+                        <field id="hww_SageConnector/general/enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Harriswebworks_SageConnector::menu" 
+             title="Sage Connector" 
+             module="Harriswebworks_SageConnector" 
+             sortOrder="100" 
+             resource="Harriswebworks_SageConnector::menu"/>
+             
+        <add id="Harriswebworks_SageConnector::setting" 
+             title="Setting" 
+             module="Harriswebworks_SageConnector" 
+             sortOrder="10" 
+             action="adminhtml/system_config/edit/section/hww_SageConnector" 
+             parent="Harriswebworks_SageConnector::menu"
+             resource="Harriswebworks_SageConnector::setting"/>
+        <add id="Harriswebworks_SageConnector::get_customers" 
+             title="Get Sage Customers" 
+             module="Harriswebworks_SageConnector" 
+             sortOrder="20" 
+             action="sageconnector/sageconnector/getcustomers" 
+             parent="Harriswebworks_SageConnector::menu"
+             resource="Harriswebworks_SageConnector::get_customers"/>
+    </menu>
+</config>

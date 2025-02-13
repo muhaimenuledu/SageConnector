@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <settings>
+        <buttons>
+            <button name="ordersync">
+                <url path="sageconnector/sageconnector/AllOrderSync"/>
+                <class>primary</class>
+                <label translate="true">All Order Sync</label>
+            </button>
+        </buttons>
+    </settings>
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction">
+            <action name="mass_order_custom_sync">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">order_custom_sync</item>
+                        <item name="label" xsi:type="string" translate="true">Order Sync</item>
+                        <item name="url" xsi:type="url" path="sageconnector/sageconnector/MassSync"/>
+                        <item name="confirm" xsi:type="array">
+                            <item name="title" xsi:type="string" translate="true">Sync Order(s)</item>
+                            <item name="message" xsi:type="string" translate="true">Are you sure you wan\'t to Sync selected items?</item>
+                        </item>
+                    </item>
+                </argument>
+            </action>
+        </massaction>
+    </listingToolbar>
+</listing>
