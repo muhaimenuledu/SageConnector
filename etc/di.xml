@@ -4,4 +4,10 @@
     <!-- <type name="Magento\Customer\Controller\Adminhtml\Index\Save">
         <plugin name="customer_data" type="Harriswebworks\SageConnector\Model\Plugin\Customer" />
     </type> -->
+    <type name="Harriswebworks\SageConnector\Controller\Adminhtml\SageConnector\CustomerSync">
+    <arguments>
+        <argument name="filter" xsi:type="object">Magento\Ui\Component\MassAction\Filter</argument>
+    </arguments>
+</type>
+
 </config>
