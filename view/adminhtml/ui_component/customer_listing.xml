@@ -9,9 +9,9 @@
     <settings>
         <buttons>
             <button name="customersync">
-                <url path="sageconnector/sageconnector/Customersync"/>
+                <url path="sageconnector/sageconnector/CustomerSync"/>
                 <class>primary</class>
-                <label translate="true">All Customer Sync</label>
+                <label translate="true">Sync Customer</label>
             </button>
         </buttons>
     </settings>
