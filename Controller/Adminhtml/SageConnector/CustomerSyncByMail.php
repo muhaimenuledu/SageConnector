@@ -46,17 +46,17 @@ class CustomerSync extends Action
 
         // SQL query to join customer_entity with cps_customers on email
         $select = $connection->select()
-            ->from(
-                ['ce' => $customerEntityTable],
-                ['email']
-            )
-            ->join(
-                ['cc' => $cpsCustomersTable],
-                'ce.email = cc.email_address',
-                ['customer_no' => 'customer_no']
-            )
-            ->where('ce.email = ?', 'm.islam@email.com') // Filter by specific email
-            ->limit(1); // Only fetch one customer
+    ->from(
+        ['ce' => $customerEntityTable],
+        ['email', 'firstname', 'lastname'] // Fetch firstname and lastname
+    )
+    ->join(
+        ['cc' => $cpsCustomersTable],
+        'ce.email = cc.email_address',
+        ['customer_no' => 'customer_no']
+    )
+    ->where('ce.email = ?', 'm.islam@email.com') // Filter by specific email
+    ->limit(1); // Only fetch one customer
 
         // Fetch customer
         $customer = $connection->fetchRow($select);
@@ -65,13 +65,24 @@ class CustomerSync extends Action
         if ($customer) {
             $email = $customer['email'];
             $customerNo = $customer['customer_no'];
-
+            $name = trim($customer['firstname'] . ' ' . $customer['lastname']);
             // Prepare data for sync (as an example)
             $postData = json_encode([
-                "ARDivisionNo" => "10",
+                "ARDivisionNo" => "20",
                 "CustomerNo" => $customerNo,
-                "EmailAddress" => $email
-            ]);
+                "CustomerName" => $name,
+                "AddressLine1" => "9400 Ashton Road",
+                "City" => "Philadelphia",
+                "ZipCode" => "19114",
+                "CountryCode" => "USA",
+                "TelephoneNo" => "(215) 969-3500",
+                "EmailAddress" => $email,
+                "TaxSchedule" => "AVATAX",
+                "TermsCode" => "00",
+                "SalespersonDivisionNo" => "10",
+                "SalespersonNo" => "9999",
+                "PriceLevel" => "R"
+            ]); //dd($postData);
 
             // Initialize cURL session for syncing data
             $curl = curl_init();
