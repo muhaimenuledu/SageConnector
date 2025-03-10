@@ -39,14 +39,12 @@ class CustomerSync extends Action
 
         $connection = $this->_resourceConnection->getConnection();
         $customerEntityTable = $connection->getTableName('customer_entity');
-        $cpsCustomersTable = $connection->getTableName('cps_customers');
 
-        // Fetch the last 10 customers (ordered by entity_id descending)
+        // Fetch the last 5 customers (ordered by entity_id descending)
         $select = $connection->select()
-            ->from(['ce' => $customerEntityTable], ['email', 'firstname', 'lastname'])
-            ->join(['cc' => $cpsCustomersTable], 'ce.email = cc.email_address', ['customer_no' => 'customer_no'])
-            ->order('ce.entity_id DESC') // Get most recent customers
-            ->limit(1);
+            ->from($customerEntityTable, ['email', 'firstname', 'lastname'])
+            ->order('entity_id DESC')
+            ->limit(5);
 
         $customers = $connection->fetchAll($select);
 
@@ -63,6 +61,7 @@ class CustomerSync extends Action
     {
         foreach ($customers as $customer) {
             $name = trim(($customer['firstname'] ?? '') . ' ' . ($customer['lastname'] ?? ''));
+            $c_no = rand(10, 10000);
             $curl = curl_init();
             curl_setopt_array($curl, [
                 CURLOPT_URL => 'https://52.186.11.198:88/customer/create/',
@@ -75,7 +74,7 @@ class CustomerSync extends Action
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => json_encode([
                     "ARDivisionNo" => "20",
-                    "CustomerNo" => $customer['customer_no'],
+                    "CustomerNo" => "M" . $c_no,
                     "CustomerName" => $name,
                     "AddressLine1" => "9400 Ashton Road",
                     "City" => "Philadelphia",
@@ -97,19 +96,16 @@ class CustomerSync extends Action
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
             ]);
-            
-            // Execute cURL request and get response
+
             $response = curl_exec($curl);
-            
-            // Check for cURL errors
+
             if (curl_errno($curl)) {
                 echo 'cURL Error: ' . curl_error($curl);
             } else {
-                // Print the response
                 header('Content-Type: application/json');
                 $this->messageManager->addNoticeMessage(__($response));
             }
-            // Close cURL session
+
             curl_close($curl);
         }
     }
