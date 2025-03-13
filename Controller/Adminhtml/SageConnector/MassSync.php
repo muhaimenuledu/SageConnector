@@ -125,8 +125,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
         $data = json_decode($response, true);
         if ($data && isset($data['customer_no'])) {
             $customerNo = $data['customer_no'];
-            
-            // $this->messageManager->addNoticeMessage(__($customerNo));
+            $ARDivisionNo = $data['ARDivisionNo'];
             //orderSage
             $curl = curl_init();
 
@@ -141,11 +140,11 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode ([
                 "SalesOrderNo" => "M" . $orderId,
-                "OrderDate"=> "2022-01-30",
+                "OrderDate"=> "2025-03-13",
                 "OrderType"=> "S",
                 "OrderStatus"=> "H",
-                "ARDivisionNo"=> "10",
-                "CustomerNo"=> "CUST001",
+                "ARDivisionNo"=> $ARDivisionNo,
+                "CustomerNo"=> $customerNo,
                 "BillToName"=> "INYODO MARTIAL ARTS",
                 "BillToAddress1"=> "101 Fawcett Rd Unit 140",
                 "BillToAddress2"=> "",
@@ -167,7 +166,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
                 "ShipWeight"=> "00018",
                 "CustomerPONo"=> "Hold-Card",
                 "WarehouseCode"=> "000",
-                "ConfirmTo"=> "DAVID SMITH",
+                "ConfirmTo"=> "HWW",
                 "Comment"=> "",
                 "TermsCode"=> "00",
                 "TaxSchedule"=> "NONTAX",
@@ -177,7 +176,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
                 "PrintPickingSheets"=> "Y",
                 "BatchFax"=> "N",
                 "BatchEmail"=> "N",
-                "EmailAddress"=> "bobcat@inyodomartialarts.com",
+                "EmailAddress"=> $email,
                 "FreightCalculationMethod"=> "A",
                 "LotSerialLinesExist"=> "N",
                 "SalespersonDivisionNo"=> "10",
@@ -248,7 +247,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
                 CURLOPT_POSTFIELDS => json_encode([
-                    "SalesOrderNo" => "X118",
+                    "SalesOrderNo" => "M" . $orderId,
                     "LineKey" => "000001",
                     "LineSeqNo" => "00000100000000",
                     "ItemCode" => "1578",
