@@ -1,0 +1,121 @@
+<?php
+
+namespace Harriswebworks\SageConnector\Controller\Adminhtml\SageConnector;
+
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Backend\App\Action;
+use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
+use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\ObjectManagerInterface;
+
+class CustomerSync extends Action
+{
+    /**
+     * @var ManagerInterface
+     */
+    protected $messageManager;
+    protected $resultPageFactory;
+    protected $_objectManager;
+    protected $_customerFactory;
+    protected $_scopeConfig;
+
+    /**
+     * @param Action\Context $context
+     * @param ManagerInterface $messageManager
+     * @param PageFactory $resultPageFactory
+     * @param ObjectManagerInterface $objectManager
+     * @param ScopeConfigInterface $scopeConfig
+     * @param CollectionFactory $customerFactory
+     */
+    public function __construct(
+        Action\Context $context,
+        ManagerInterface $messageManager,
+        PageFactory $resultPageFactory,
+        ObjectManagerInterface $objectManager,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $customerFactory
+    ) {
+        parent::__construct($context);
+        $this->resultPageFactory = $resultPageFactory;
+        $this->_objectManager = $objectManager;
+        $this->messageManager = $messageManager;
+        $this->_scopeConfig = $scopeConfig;
+        $this->_customerFactory = $customerFactory;
+    }
+
+    /**
+     * Execute the controller action to sync selected customers.
+     *
+     * @return \Magento\Backend\Model\View\Result\Redirect
+     */
+    public function execute()
+    {
+        // Get selected customer IDs from the request
+        $selectedCustomerIds = $this->getRequest()->getParam('selected', []);
+        // dd($selectedCustomerIds);
+        if (empty($selectedCustomerIds)) {
+            $this->messageManager->addError(__('No customers selected for sync.'));
+            return $this->_redirect('*/*/');
+        }
+
+        // Loop through the selected customer IDs and sync each one
+        foreach ($selectedCustomerIds as $customerId) {
+            $customer = $this->_objectManager->create(\Magento\Customer\Model\Customer::class)->load($customerId);
+            
+            if ($customer->getId()) {
+                $fname = $customer->getFirstname();
+                $lname = $customer->getLastname();
+                $name = $fname . ' ' . $lname;
+                $email = $customer->getEmail();
+
+                // Sync customer data
+                // $this->sagecreate($name, $email);
+                // dd($name);
+            }
+        }
+
+        // Show success message
+        $this->messageManager->addSuccess(__('Selected customers have been synced successfully.'));
+
+        return $this->_redirect('*/*/');
+    }
+
+    /**
+     * Create a customer in Sage.
+     *
+     * @param string $name
+     * @param string $email
+     */
+    protected function sagecreate($name, $email)
+    {
+        $isEnabled = $this->_scopeConfig->getValue('hww_SageConnector/general/enable', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $url = $this->_scopeConfig->getValue('hww_SageConnector/general/url', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+        if ($isEnabled && !empty($url)) {
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $url . '/hww/customerSyncAPI/',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_POSTFIELDS => json_encode([
+                    'params' => [
+                        'name'  => $name,
+                        'email' => $email
+                    ]
+                ]),
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json',
+                ],
+            ));
+
+            $response = curl_exec($curl);
+            curl_close($curl);
+        }
+    }
+}

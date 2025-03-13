@@ -106,6 +106,15 @@ class CustomerSync extends Action
                 $this->messageManager->addNoticeMessage(__($response));
             }
 
+            $data = json_decode($response, true);
+            if ($data && isset($data['customer_no'])) {
+                $customerNo = $data['customer_no'];
+                
+                $this->messageManager->addNoticeMessage(__($customerNo));
+            } else {
+                echo "Customer number not found in response.";
+            }
+
             curl_close($curl);
         }
     }
