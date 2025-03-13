@@ -109,8 +109,9 @@ class CustomerSync extends Action
             $data = json_decode($response, true);
             if ($data && isset($data['customer_no'])) {
                 $customerNo = $data['customer_no'];
+                $ARDivisionNo = $data['ARDivisionNo'];
                 
-                $this->messageManager->addNoticeMessage(__($customerNo));
+                $this->messageManager->addNoticeMessage(__($customerNo . "=" . $ARDivisionNo));
             } else {
                 echo "Customer number not found in response.";
             }
