@@ -38,7 +38,11 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
                 $customerEmail = $order->getCustomerEmail();
                 $customerName = $order->getCustomerName();
                 $orderId = $order->getId();
+                $orderNumber = $order->getIncrementId();
+                // $orderNumber = str_pad($order->getIncrementId(), 6, '0', STR_PAD_LEFT);
+                $orderNumber = preg_replace('/^000/', '', $orderNumber);
                 // dd($orderId);
+                // dd($orderNumber);
                 $createdAt = $order->getCreatedAt();
 
                 $orderItems = [];
@@ -56,8 +60,8 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
                 }
 
                 $data = json_encode($orderItems, JSON_PRETTY_PRINT);
-                $this->syncCustomer($customerName, $customerEmail, $c_no, $orderId, $itemCode);
-                // $this->syncOrder($customerEmail, $orderId, $createdAt, $data, $c_no);
+                $this->syncCustomer($customerName, $customerEmail, $c_no, $orderNumber, $itemCode);
+                // $this->syncOrder($customerEmail, $orderNumber, $createdAt, $data, $c_no);
                 $countSyncedOrders++;
                 
             } catch (\Exception $e) {
@@ -74,7 +78,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
         return $this->resultRedirectFactory->create()->setPath('sales/order/index');
     }
 
-    private function syncCustomer($name, $email, $c_no, $orderId, $itemCode)
+    private function syncCustomer($name, $email, $c_no, $orderNumber, $itemCode)
     {
         //sage 
         // dd($itemCode);
@@ -139,7 +143,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode ([
-                "SalesOrderNo" => "M" . $orderId,
+                "SalesOrderNo" => "M" . $orderNumber,
                 "OrderDate"=> "2025-03-13",
                 "OrderType"=> "S",
                 "OrderStatus"=> "H",
@@ -233,7 +237,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
             $orderResponse = json_decode($response, true);
             $orderStatus = $orderResponse['status'];
             if ($orderStatus === 'success'){
-                $this->messageManager->addNoticeMessage(__("Post Header Infromation " . $orderStatus . " SalesOrderNo => M" . $orderId));
+                $this->messageManager->addNoticeMessage(__("Post Header Infromation " . $orderStatus . " SalesOrderNo => M" . $orderNumber));
                 // insert into so_order_detail
                 $curl = curl_init();
 
@@ -247,7 +251,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
                 CURLOPT_POSTFIELDS => json_encode([
-                    "SalesOrderNo" => "M" . $orderId,
+                    "SalesOrderNo" => "M" . $orderNumber,
                     "LineKey" => "000001",
                     "LineSeqNo" => "00000100000000",
                     "ItemCode" => "1578",
@@ -281,7 +285,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
         //sage
     }
 
-    private function syncOrder($customerEmail, $orderId, $createdAt, $data, $c_no)
+    private function syncOrder($customerEmail, $orderNumber, $createdAt, $data, $c_no)
     {
         //sage
         //this function will work when customer doesn't exists in sage
@@ -297,7 +301,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS => json_encode ([
-            "SalesOrderNo" => "M" . $orderId,
+            "SalesOrderNo" => "M" . $orderNumber,
             "OrderDate"=> "2022-01-30",
             "OrderType"=> "S",
             "OrderStatus"=> "H",
@@ -389,7 +393,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
         $response = curl_exec($curl);
 
         curl_close($curl);
-        $this->messageManager->addNoticeMessage(__($response . "M" . $orderId));
+        $this->messageManager->addNoticeMessage(__($response . "M" . $orderNumber));
         //sage
     }
 }
