@@ -44,6 +44,8 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
                 // dd($orderId);
                 // dd($orderNumber);
                 $createdAt = $order->getCreatedAt();
+                $orderDate = date('Y-m-d', strtotime($createdAt));
+                // dd($orderDate);
 
                 $orderItems = [];
                 foreach ($order->getAllVisibleItems() as $item) {
@@ -60,7 +62,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
                 }
 
                 $data = json_encode($orderItems, JSON_PRETTY_PRINT);
-                $this->syncCustomer($customerName, $customerEmail, $c_no, $orderNumber, $itemCode);
+                $this->syncCustomer($customerName, $customerEmail, $c_no, $orderNumber, $itemCode, $orderDate);
                 // $this->syncOrder($customerEmail, $orderNumber, $createdAt, $data, $c_no);
                 $countSyncedOrders++;
                 
@@ -78,7 +80,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
         return $this->resultRedirectFactory->create()->setPath('sales/order/index');
     }
 
-    private function syncCustomer($name, $email, $c_no, $orderNumber, $itemCode)
+    private function syncCustomer($name, $email, $c_no, $orderNumber, $itemCode, $orderDate)
     {
         //sage 
         // dd($itemCode);
@@ -144,7 +146,7 @@ class MassSync extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAct
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode ([
                 "SalesOrderNo" => "M" . $orderNumber,
-                "OrderDate"=> "2025-03-13",
+                "OrderDate"=> $orderDate,
                 "OrderType"=> "S",
                 "OrderStatus"=> "H",
                 "ARDivisionNo"=> $ARDivisionNo,
