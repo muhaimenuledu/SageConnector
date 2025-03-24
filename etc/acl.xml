@@ -6,6 +6,7 @@
                 <resource id="Harriswebworks_SageConnector::menu" title="Sage Connector" sortOrder="100"/>
                 <resource id="Harriswebworks_SageConnector::setting" title="Setting" sortOrder="10"/>
                 <resource id="Harriswebworks_SageConnector::get_customers" title="Get Sage Customers" sortOrder="10"/>
+                <resource id="Harriswebworks_SageConnector::sync" title="Product Sync" sortOrder="10" />
             </resource>
         </resources>
     </acl>
