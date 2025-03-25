@@ -23,7 +23,7 @@ class ProductSync extends Action
         $result = $this->jsonFactory->create();
 
         try {
-            $apiUrl = 'https://52.186.11.198:88/product/test_mage_con.php';
+            $apiUrl = 'https://52.186.11.198:88/product/export.php';
 
             // Initialize cURL
             $curl = curl_init();
