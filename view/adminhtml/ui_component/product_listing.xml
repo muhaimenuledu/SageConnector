@@ -9,7 +9,7 @@
     <settings>
         <buttons>
             <button name="productsync">
-                <url path="sageconnector/sageconnector/productsync"/>
+                <url path="sageconnector/sageconnector/ProductSync"/>
                 <class>primary</class>
                 <label translate="true">All Product Sync</label>
             </button>
