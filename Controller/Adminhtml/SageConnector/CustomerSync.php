@@ -39,11 +39,30 @@ class CustomerSync extends Action
 
         $connection = $this->_resourceConnection->getConnection();
         $customerEntityTable = $connection->getTableName('customer_entity');
+        $orderTable = $connection->getTableName('sales_order');
+        $addressTable = $connection->getTableName('customer_address_entity');
 
-        // Fetch the last 5 customers (ordered by entity_id descending)
+        $regionTable = $connection->getTableName('directory_country_region');
+
         $select = $connection->select()
-            ->from($customerEntityTable, ['email', 'firstname', 'lastname'])
-            ->order('entity_id DESC')
+            ->from(['ce' => $customerEntityTable], ['email', 'firstname', 'lastname'])
+            ->joinInner(
+                ['so' => $orderTable],
+                'ce.entity_id = so.customer_id',
+                []
+            )
+            ->joinLeft(
+                ['cae' => $addressTable],
+                'ce.default_billing = cae.entity_id',
+                ['street', 'city', 'postcode', 'country_id', 'telephone', 'region_id']
+            )
+            ->joinLeft(
+                ['r' => $regionTable],
+                'r.region_id = cae.region_id',
+                ['region_code' => 'code']
+            )
+            ->group('ce.entity_id')
+            ->order('ce.entity_id DESC')
             ->limit(5);
 
         $customers = $connection->fetchAll($select);
@@ -61,6 +80,13 @@ class CustomerSync extends Action
     {
         foreach ($customers as $customer) {
             $name = trim(($customer['firstname'] ?? '') . ' ' . ($customer['lastname'] ?? ''));
+            $address = $customer['street'];
+            $city = $customer['city'];
+            $state = $customer['region_code'];
+            $zip = $customer['postcode'];
+            $country = $customer['country_id'];
+            $telephone = $customer['telephone'];
+            // dd($address, $city);
             $c_no = rand(10, 10000);
             $curl = curl_init();
             curl_setopt_array($curl, [
@@ -76,12 +102,12 @@ class CustomerSync extends Action
                     "ARDivisionNo" => "20",
                     "CustomerNo" => "M" . $c_no,
                     "CustomerName" => $name,
-                    "AddressLine1" => "9400 Ashton Road",
-                    "City" => "Philadelphia",
-                    "State" => "PA",
-                    "ZipCode" => "19114",
-                    "CountryCode" => "USA",
-                    "TelephoneNo" => "(215) 969-3500",
+                    "AddressLine1" => $address,
+                    "City" => $city,
+                    "State" => $state,
+                    "ZipCode" => $zip,
+                    "CountryCode" => $country,
+                    "TelephoneNo" => $telephone,
                     "EmailAddress" => $customer['email'],
                     "TaxSchedule" => "AVATAX",
                     "TermsCode" => "00",
